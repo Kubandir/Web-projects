@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainote</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Brainote</h1>
+    <p class="subtitle">Notes2brainrot convertor...</p>
+    <form id="storyForm">
+        <textarea id="textInput" placeholder="Sem napiš/vlož svůj text (Max 2000 znaků)" maxlength="2000"></textarea>
+        <select id="videoSelect">
+            <option value="minecraft">Minecraft Parkour</option>
+            <option value="subway">Subway Surfers</option>
+            <option value="gta">GTA Padající auta</option>
+        </select>
+        <button type="submit">Navařit mozkovou hnilobu</button>
+    </form>
+
+    <p id="status"></p>
+    <video id="outputVideo" controls></video>
+
+    <script>
+        const form = document.getElementById('storyForm');
+        const statusText = document.getElementById('status');
+        const videoElement = document.getElementById('outputVideo');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const text = document.getElementById('textInput').value;
+            const videoType = document.getElementById('videoSelect').value;
+
+            statusText.textContent = 'Vařím...';
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text, videoType }),
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                videoElement.src = url;
+                videoElement.style.display = 'block';
+                statusText.textContent = 'Video bylo úspěšně navařeno!';
+            } else {
+                statusText.textContent = 'Při vaření nastala chyba...';
+            }
+        };
+    </script>
+</body>
+</html>
